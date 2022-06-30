@@ -2,5 +2,19 @@ version: '3.9'
 
 services:
   mysql:
-    image: mysql
-    
+    image: mysql:8.0.29
+    container_name: mysql
+    restart: always
+    command: 
+      --lower_case_table_names=1
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: 1234qwer
+    volumes:
+      - ./data:/var/lib/mysql
+      - ./config:/etc/mysql/conf.d
+    ports:
+      - 3306:3306

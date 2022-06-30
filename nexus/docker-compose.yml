@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  nexus:
+    image: sonatype/nexus3:latest
+    container_name: nexus3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nexus3.rule=Host(`nexus3.tapoop.com`)"
+      - "traefik.http.routers.nexus3.entrypoints=websecure"
+      - "traefik.http.routers.nexus3.tls.certresolver=leresolver"
+    restart: always
+    volumes:
+      - /home/nexus/nexus-data:/nexus-data
+    expose:
+      - 8081
+    healthcheck:
+      test: ["CMD", "/nexus-data/health.sh"]
+      interval: 2m
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+    networks:
+      - traefik
+networks:
+  traefik:
+    external:
+      name: traefik
