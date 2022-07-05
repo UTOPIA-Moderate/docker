@@ -1,0 +1,44 @@
+version: '3.9'
+
+services:
+  db:
+    image: mariadb
+    volumes:
+      - /home/mariadb/data:/var/lib/mysql:rw
+    restart: always
+    networks:
+      - traefik
+    environment:
+      MYSQL_ROOT_PASSWORD: chevereto_root
+      MYSQL_DATABASE: chevereto
+      MYSQL_USER: chevereto
+      MYSQL_PASSWORD: chevereto
+
+  chevereto:
+    depends_on:
+      - db
+    image: nmtan/chevereto
+    container_name: chevereto
+    restart: always
+    networks:
+      - traefik
+    environment:
+      CHEVERETO_DB_HOST: db
+      CHEVERETO_DB_USERNAME: chevereto
+      CHEVERETO_DB_PASSWORD: chevereto
+      CHEVERETO_DB_NAME: chevereto
+      CHEVERETO_DB_PREFIX: chv_
+    volumes:
+      - /OneDrive/chevereto:/var/www/html/images:rw
+    expose:
+      - 80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pic.rule=Host(`pic.tapoop.com`)"
+      - "traefik.http.routers.pic.entrypoints=websecure"
+      - "traefik.http.routers.pic.tls.certresolver=leresolver"
+
+networks:
+  traefik:
+    external:
+      name: traefik
