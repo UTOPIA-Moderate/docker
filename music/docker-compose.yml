@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  music:
+    image: pan93412/unblock-netease-music-enhanced:latest
+    container_name: music
+    restart: always
+    expose:
+      - 8080
+    networks:
+      - traefik
+    environment:
+      - ENABLE_FLAC=true
+      - ENABLE_LOCAL_VIP=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.music.rule=Host(`music.tapoop.com`)"
+      - "traefik.http.routers.music.entrypoints=websecure"
+      - "traefik.http.routers.music.tls.certresolver=leresolver"
+
+networks:
+  traefik:
+    external:
+      name: traefik

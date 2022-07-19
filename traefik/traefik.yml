@@ -1,0 +1,32 @@
+providers:
+  file:
+    directory: /etc/traefik/dyncmic_providers/
+    watch: true
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+api:
+  insecure: true
+  dashboard: true
+log:
+  level: ERROR
+  filePath: /etc/traefik/traefik.log
+  format: json
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  leresolver:
+    acme:
+      email: liyang30000@163.com
+      storage: /home/traefik/acme.json
+      httpchallenge: 
+        entryPoint: web

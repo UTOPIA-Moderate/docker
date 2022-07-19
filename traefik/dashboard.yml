@@ -1,0 +1,15 @@
+http:
+  routers:
+    api:
+      entryPoints:
+        - websecure
+      service: api@internal
+      rule: Host(`dashboard.tapoop.com`)
+      tls: 
+        certresolver: leresolver
+      middlewares: traefik-auth
+  middlewares:
+    traefik-auth:
+      basicauth:
+        users:
+          - dsb:$apr1$19d18NNC$FmDljmc5T5unjroz4idkW1

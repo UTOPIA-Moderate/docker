@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  e5:
+    image: hanhongyong/ms365-e5-renew-x:latest
+    container_name: e5
+    restart: always
+    volumes:
+      - /home/e5:/app/Deploy
+    expose:
+      - 1066

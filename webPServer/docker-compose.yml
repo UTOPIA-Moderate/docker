@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  webp:
+    image: webpsh/webp-server-go:latest
+    restart: always
+    networks:
+      - traefik
+    volumes:
+      - /OneDrive/webp/pics:/opt/pics
+      - /OneDrive/webp/exhaust:/opt/exhaust
+      - /OneDrive/webp/config.json:/etc/config.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pic.rule=Host(`pic.tapoop.com`)"
+      - "traefik.http.routers.pic.entrypoints=websecure"
+      - "traefik.http.routers.pic.tls.certresolver=leresolver"
+    expose:
+      - 3333
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+networks:
+  traefik:
+    external:
+      name: traefik
