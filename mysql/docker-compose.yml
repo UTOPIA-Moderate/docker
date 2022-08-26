@@ -15,6 +15,6 @@ services:
       MYSQL_ROOT_PASSWORD: 1234qwer
     volumes:
       - ./data:/var/lib/mysql
-      - ./config:/etc/mysql/conf.d
+      - ./conf:/etc/mysql/conf.d
     ports:
       - 3306:3306
