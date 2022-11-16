@@ -1,0 +1,10 @@
+FROM debian:stable-slim
+
+WORKDIR /data/
+
+ADD jdk-8u341-linux-x64.tar.gz /java_home/jdk
+
+ENV JAVA_HOME=/java_home/jdk/jdk1.8.0_341
+ENV PATH=${JAVA_HOME}/bin:$PATH
+
+CMD ["java", "-version"]

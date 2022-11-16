@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  mongo:
+    image: mongo:6.0.2
+    container_name: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+    volumes:
+      - ./data:/data/db
+    expose:
+      - 27017
+    networks:
+      default:
+        ipv4_address: 172.20.0.5
+  
+  mongo-express:
+    image: mongo-express:0.54.0
+    container_name: mongo-express
+    depends_on: 
+      - mongo
+    links:
+      - mongo
+    expose:
+      - 8081
+    environment:
+      ME_CONFIG_OPTIONS_EDITORTHEME: 3024-night
+      ME_CONFIG_BASICAUTH_USERNAME: mongoadmin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: P@ssw0rd
+    networks:
+      default:
+        ipv4_address: 172.20.0.6
+networks:
+  default:
+    name: br0
+    external: true

@@ -1,0 +1,5 @@
+FROM stretch
+
+COPY xray /usr/local/bin
+
+WORKDIR /usr/local/etc/xray

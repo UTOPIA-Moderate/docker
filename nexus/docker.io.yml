@@ -1,0 +1,10 @@
+http:
+  routers:
+    api:
+      entryPoints:
+        - web
+        - websecure
+      service: nexus-nexus3
+      rule: Host(`docker.tapoop.com`)
+      tls:
+        certresolver: leresolver

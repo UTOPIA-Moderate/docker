@@ -7,7 +7,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.http.routers.alist.rule=Host(`alist.tapoop.com`)
-      - traefik.http.routers.alist.entrypoints=websecure
+      - traefik.http.routers.alis t.entrypoints=websecure
       - traefik.http.routers.alist.tls.certresolver=leresolver
     restart: always
     volumes:

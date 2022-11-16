@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  rabbitMQ:
+    image: rabbitmq:3.11.3
+    container_name: rabbitMQ
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=P@ssw0rd
+    volumes:
+      - ./data:/var/lib/rabbitmq/mnesia
+    expose:
+      - 5672
+      - 15672
+    networks:
+      default:
+        ipv4_address: 172.20.0.4
+networks:
+  default:
+    name: br0
+    external: true

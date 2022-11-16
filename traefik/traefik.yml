@@ -7,6 +7,7 @@ providers:
 api:
   insecure: true
   dashboard: true
+
 log:
   level: ERROR
   filePath: /etc/traefik/traefik.log
@@ -22,11 +23,26 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+  metrics:
+    address: ":8082"
+
+experimental:
+  hub: true
+hub:
+  tls:
+    insecure: true
+
+metrics:
+  prometheus:
+    addEntryPointsLabels: true
+    addRoutersLabels: true
+    addServicesLabels: true
+    entryPoint: metrics
 
 certificatesResolvers:
   leresolver:
     acme:
       email: liyang30000@163.com
       storage: /home/traefik/acme.json
-      httpchallenge: 
+      httpchallenge:
         entryPoint: web
