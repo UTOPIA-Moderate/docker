@@ -16,4 +16,9 @@ services:
     devices:
       - /dev/dri:/dev/dri
     ports:
-      - 12501:8096
+      - 8096:8096
+
+networks:
+  default:
+    name: br0
+    external: true
