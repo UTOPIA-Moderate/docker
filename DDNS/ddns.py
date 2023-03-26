@@ -3,9 +3,9 @@ import os
 import sys
 
 API_KEY = ''
-EMAIL = 'alinuxsa+cf@gmail.com'
-ZONE_NAME = 'ccysh.club'
-RECORD_NAME = 'n1'
+EMAIL = ''
+ZONE_NAME = ''
+RECORD_NAME = ''
 
 
 def get_addr():
