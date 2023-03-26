@@ -10,12 +10,11 @@ services:
       - RABBITMQ_DEFAULT_PASS=P@ssw0rd
     volumes:
       - ./data:/var/lib/rabbitmq/mnesia
-    expose:
-      - 5672
-      - 15672
+    ports:
+      - 5672:5672
+      - 15672:15672
     networks:
-      default:
-        ipv4_address: 172.20.0.4
+      - default
 networks:
   default:
     name: br0

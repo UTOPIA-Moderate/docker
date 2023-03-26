@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  minio:
+    image: bitnami/minio:2023.2.17
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=1234qwer
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./data:/data
+    networks:
+      - default
+networks:
+  default:
+    name: br0
+    external: true

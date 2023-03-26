@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+  js-server:
+    image: node:latest
+    container_name: js-server
+    restart: always
+    ports:
+      - 8888:8888
+    volumes:
+      - ./data:/data
+    working_dir: /data
+    networks:
+      - default
+    command: node /data/server.js 8888
+networks:
+  default:
+    name: br0
+    external: true

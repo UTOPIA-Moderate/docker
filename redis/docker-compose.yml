@@ -2,18 +2,17 @@ version: '3.9'
 
 services:
   redis:
-    image: redis:6.2.7
+    image: redis:7.0.9
     restart: always
     container_name: redis
-    expose:
-      - 6379
+    ports:
+      - 6379:6379
     volumes:
       - ./conf/redis.conf:/etc/redis/redis.conf
       - ./data:/data
     command: redis-server /etc/redis/redis.conf
     networks:
-      default:
-        ipv4_address: 172.20.0.3
+      - default
 networks:
   default:
     name: br0

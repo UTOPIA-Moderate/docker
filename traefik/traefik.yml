@@ -10,7 +10,7 @@ api:
 
 log:
   level: ERROR
-  filePath: /etc/traefik/traefik.log
+  filePath: /var/log/traefik/error.log
   format: json
 
 entryPoints:
@@ -27,7 +27,7 @@ entryPoints:
 certificatesResolvers:
   leresolver:
     acme:
-      email: liyang30000@163.com
+      email: devil1990@outlook.com
       storage: /home/traefik/acme.json
       httpchallenge:
         entryPoint: web
