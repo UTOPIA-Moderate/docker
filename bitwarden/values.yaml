@@ -1,0 +1,309 @@
+image:
+  registry: docker.io
+  repository: traefik
+  tag: v2.9.4
+
+hub:
+  enabled: false
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 1
+  terminationGracePeriodSeconds: 60
+  minReadySeconds: 0
+  additionalContainers:
+    - name: socat-proxy
+      image: alpine/socat:1.0.5
+      args: ["-s", "-u", "udp-recv:8125", "unix-sendto:/socket/socket"]
+      volumeMounts:
+        - name: dsdsocket
+          mountPath: /socket
+  additionalVolumes:
+    - name: dsdsocket
+      hostPath:
+        path: /var/run/statsd-exporter
+  initContainers:
+    - name: volume-permissions
+      image: busybox:latest
+      command: ["sh", "-c", "touch /data/acme.json; chmod -v 600 /data/acme.json"]
+      securityContext:
+        runAsNonRoot: true
+        runAsGroup: 65532
+        runAsUser: 65532
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  shareProcessNamespace: false
+  lifecycle:
+    preStop:
+      exec:
+        command: ["/bin/sh", "-c", "sleep 40"]
+    postStart:
+      httpGet:
+        path: /ping
+        port: 9000
+        host: localhost
+        scheme: HTTP
+
+podDisruptionBudget:
+  enabled: false
+
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+
+experimental:
+  v3:
+    enabled: false
+  plugins:
+    enabled: false
+  kubernetesGateway:
+    enabled: false
+    gateway:
+      enabled: true
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: PathPrefix(`/dashboard`) || PathPrefix(`/api`)
+    entryPoints: ["traefik"]
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+readinessProbe:
+  failureThreshold: 1
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+
+livenessProbe:
+  failureThreshold: 3
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 2
+
+
+providers:
+  kubernetesCRD:
+    enabled: true
+    allowCrossNamespace: false
+    allowExternalNameServices: false
+    allowEmptyServices: false
+    ingressClass: traefik-internal
+    labelSelector: environment=production,method=traefik
+    namespaces:
+      - "kube-system"
+
+  kubernetesIngress:
+    enabled: true
+    allowExternalNameServices: false
+    allowEmptyServices: false
+    ingressClass: traefik-internal
+    labelSelector: environment=production,method=traefik
+    namespaces:
+      - "kube-system"
+    publishedService:
+      enabled: false
+
+logs:
+  general:
+    level: ERROR
+  access:
+    enabled: false
+    fields:
+      general:
+        defaultmode: keep
+      headers:
+        defaultmode: drop
+
+
+
+globalArguments:
+  - "--global.checknewversion"
+  - "--global.sendanonymoususage"
+
+ports:
+  traefik:
+    port: 9000
+    expose: true
+    exposedPort: 9000
+    protocol: TCP
+  web:
+    port: 8000
+    expose: true
+    exposedPort: 80
+    protocol: TCP
+  websecure:
+    port: 8443
+    asDefault: true
+    expose: true
+    exposedPort: 443
+    protocol: TCP
+    http3:
+      enabled: false
+    tls:
+      enabled: true
+      options: default
+      certResolver: letsencrypt
+      domains:
+      - main: 567222.xyz
+        sans:
+          - dsb.567222.xyz
+    #
+    # One can apply Middlewares on an entrypoint
+    # https://doc.traefik.io/traefik/middlewares/overview/
+    # https://doc.traefik.io/traefik/routing/entrypoints/#middlewares
+    # /!\ It introduces here a link between your static configuration and your dynamic configuration /!\
+    # It follows the provider naming convention: https://doc.traefik.io/traefik/providers/overview/#provider-namespace
+    # middlewares:
+    #   - namespace-name1@kubernetescrd
+    #   - namespace-name2@kubernetescrd
+    middlewares: []
+  metrics:
+    # When using hostNetwork, use another port to avoid conflict with node exporter:
+    # https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+    port: 9100
+    # hostPort: 9100
+    # Defines whether the port is exposed if service.type is LoadBalancer or
+    # NodePort.
+    #
+    # You may not want to expose the metrics port on production deployments.
+    # If you want to access it from outside of your cluster,
+    # use `kubectl port-forward` or create a secure ingress
+    expose: false
+    # The exposed port for this service
+    exposedPort: 9100
+    # The port protocol (TCP/UDP)
+    protocol: TCP
+
+# Options for the main traefik service, where the entrypoints traffic comes
+# from.
+service:
+  enabled: true
+  ## Single service is using `MixedProtocolLBService` feature gate.
+  ## When set to false, it will create two Service, one for TCP and one for UDP.
+  single: true
+  type: LoadBalancer
+autoscaling:
+  enabled: false
+persistence:
+  enabled: false
+  name: data
+  #  existingClaim: ""
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  # storageClass: ""
+  # volumeName: ""
+  path: /data
+  # subPath: "" # only mount a subpath of the Volume into the pod
+
+certResolvers:
+  letsencrypt:
+    # for challenge options cf. https://doc.traefik.io/traefik/https/acme/
+    email: email@example.com
+    tlsChallenge: true
+    httpChallenge:
+      entryPoint: "web"
+    # It has to match the path with a persistent volume
+    storage: /data/acme.json
+
+# If hostNetwork is true, runs traefik in the host network namespace
+# To prevent unschedulabel pods due to port collisions, if hostNetwork=true
+# and replicas>1, a pod anti-affinity is recommended and will be set if the
+# affinity is left as default.
+hostNetwork: false
+
+# Whether Role Based Access Control objects like roles and rolebindings should be created
+rbac:
+  enabled: true
+  # If set to false, installs ClusterRole and ClusterRoleBinding so Traefik can be used across namespaces.
+  # If set to true, installs Role and RoleBinding. Providers will only watch target namespace.
+  namespaced: false
+  # Enable user-facing roles
+  # https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles
+  # aggregateTo: [ "admin" ]
+
+# Enable to create a PodSecurityPolicy and assign it to the Service Account via RoleBinding or ClusterRoleBinding
+podSecurityPolicy:
+  enabled: false
+
+# The service account the pods will use to interact with the Kubernetes API
+serviceAccount:
+  # If set, an existing service account is used
+  # If not set, a service account is created automatically using the fullname template
+  name: ""
+
+# Additional serviceAccount annotations (e.g. for oidc authentication)
+serviceAccountAnnotations: {}
+
+resources:
+  {}
+  # requests:
+  #   cpu: "100m"
+  #   memory: "50Mi"
+  # limits:
+  #   cpu: "300m"
+  #   memory: "150Mi"
+
+# This example pod anti-affinity forces the scheduler to put traefik pods
+# on nodes where no other traefik pods are scheduled.
+# It should be used when hostNetwork: true to prevent port conflicts
+affinity: {}
+#  podAntiAffinity:
+#    requiredDuringSchedulingIgnoredDuringExecution:
+#      - labelSelector:
+#          matchLabels:
+#            app.kubernetes.io/name: '{{ template "traefik.name" . }}'
+#            app.kubernetes.io/instance: '{{ .Release.Name }}-{{ .Release.Namespace }}'
+#        topologyKey: kubernetes.io/hostname
+
+nodeSelector: {}
+tolerations: []
+topologySpreadConstraints: []
+# # This example topologySpreadConstraints forces the scheduler to put traefik pods
+# # on nodes where no other traefik pods are scheduled.
+#  - labelSelector:
+#      matchLabels:
+#        app: '{{ template "traefik.name" . }}'
+#    maxSkew: 1
+#    topologyKey: kubernetes.io/hostname
+#    whenUnsatisfiable: DoNotSchedule
+
+# Pods can have priority.
+# Priority indicates the importance of a Pod relative to other Pods.
+priorityClassName: ""
+
+# Set the container security context
+# To run the container with ports below 1024 this will need to be adjust to run as root
+securityContext:
+  capabilities:
+    drop: [ALL]
+  readOnlyRootFilesystem: true
+
+podSecurityContext:
+  #  # /!\ When setting fsGroup, Kubernetes will recursively changes ownership and
+  #  # permissions for the contents of each volume to match the fsGroup. This can
+  #  # be an issue when storing sensitive content like TLS Certificates /!\
+  #  fsGroup: 65532
+  fsGroupChangePolicy: "OnRootMismatch"
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+
+#
+# Extra objects to deploy (value evaluated as a template)
+#
+# In some cases, it can avoid the need for additional, extended or adhoc deployments.
+# See #595 for more details and traefik/tests/values/extra.yaml for example.
+extraObjects: []
+# This will override the default Release Namespace for Helm.
+# It will not affect optional CRDs such as `ServiceMonitor` and `PrometheusRules`
+# namespaceOverride: traefik
+#
+## This will override the default app.kubernetes.io/instance label for all Objects.
+# instanceLabelOverride: traefik

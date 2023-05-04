@@ -6,16 +6,13 @@ services:
     container_name: nacos
     ports:
       - 8848:8848
-    environment:
-      - MODE=standalone
-      - PREFER_HOST_MODE=hostname
-      # - NACOS_AUTH_TOKEN=e6b05ef8-3d41-4482-ae5f-c613016e477e
-      # - SPRING_DATASOURCE_PLATFORM=mysql
-      # - MYSQL_SERVICE_HOST=ubuntu
-      # - MYSQL_SERVICE_PORT=3306
-      # - MYSQL_SERVICE_DB_NAME=oauth2_server
-      # - MYSQL_SERVICE_USER=tapoop
-      # - MYSQL_SERVICE_PASSWORD=1234qwer
+      - 9848:9848
+      - 9849:9849
+    depends_on:
+      mysql:
+        condition: service_healthy
+    env_file:
+      - ./nacos-standlone-mysql.env
     networks:
       - default
 networks:

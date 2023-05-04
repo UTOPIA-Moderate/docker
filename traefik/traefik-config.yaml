@@ -1,0 +1,38 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  valuesContent: |-
+    ports:
+      web:
+        port: 8000
+        expose: true
+        exposedPort: 80
+        protocol: TCP
+        redirectTo: websecure
+        forwardedHeaders:
+          enable: true
+      websecure:
+        port: 8443
+        expose: true
+        exposedPort: 443
+        protocol: TCP
+        forwardedHeaders:
+          enable: true
+        tls:
+          enabled: true
+          certResolver: myresolver
+    persistence:
+      enabled: true
+      name: traefik-data
+      accessMode: ReadWriteOnce
+      size: 128Mi
+      path: /data
+    certResolvers:
+      myresolver:
+        tlsChallenge: true
+        httpChallenge:
+          entryPoint: web
+        storage: /data/acme.json

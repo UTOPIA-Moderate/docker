@@ -1,0 +1,23 @@
+version: '3.9'
+
+services:
+  singbox:
+    image: gzxhwq/sing-box
+    container_name: singbox
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.singbox.rule=Host(`bit.memol.cn`) && Path(`/backend`)
+      - traefik.http.routers.singbox.entrypoints=websecure
+      - traefik.http.routers.singbox.tls.certresolver=leresolver
+      - traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto=https,wss
+    networks:
+      - default
+    expose:
+      - 80
+    volumes:
+      - ./conf/:/etc/sing-box/:rw
+networks:
+  default:
+    name: br0
+    external: true

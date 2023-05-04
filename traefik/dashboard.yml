@@ -4,12 +4,12 @@ http:
       entryPoints:
         - websecure
       service: api@internal
-      rule: Host(`dashboard.tapoop.com`)
+      rule: Host(`dash.567222.xyz`)
       tls: 
-        certresolver: leresolver
+        certresolver: myresolver
       middlewares: traefik-auth
   middlewares:
     traefik-auth:
       basicauth:
         users:
-          - dsb:$apr1$19d18NNC$FmDljmc5T5unjroz4idkW1
+          - admin:$2a$10$CKTWqeN1n3zJUfvXADyti.TvtwJYxmY4xydhUa06BcUhvsWG5pukK

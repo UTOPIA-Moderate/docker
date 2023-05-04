@@ -1,6 +1,6 @@
 providers:
   file:
-    directory: /etc/traefik/dyncmic_providers/
+    directory: /etc/traefik/conf/
     watch: true
   docker:
     endpoint: "unix:///var/run/docker.sock"
@@ -25,7 +25,7 @@ entryPoints:
     address: ":443"
 
 certificatesResolvers:
-  leresolver:
+  myresolver:
     acme:
       email: devil1990@outlook.com
       storage: /home/traefik/acme.json

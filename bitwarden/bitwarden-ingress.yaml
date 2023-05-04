@@ -1,0 +1,16 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: bitwarden
+spec:
+  entryPoints:
+  - websecure
+  routes:
+  - match: Host(`bit.567222.xyz`)
+    kind: Rule
+    services:
+    - name: bitwarden
+      port: 8080
+      namespace: default  # 修改为 SingBox 的 Namespace
+  tls:
+    certResolver: myresolver
