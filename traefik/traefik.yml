@@ -24,8 +24,8 @@ providers:
   docker:
     watch: true
     endpoint: "unix:///var/run/docker.sock"
-    swarmMode: fasle
-    useBindPortIP: fasle
+    swarmMode: false
+    useBindPortIP: false
     network: traefik
   file:
     watch: true
