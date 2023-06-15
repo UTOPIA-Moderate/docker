@@ -6,7 +6,7 @@ http:
       service: api@internal
       rule: Host(`dash.567222.xyz`)
       tls: 
-        certresolver: myresolver
+        certresolver: mycrt
       middlewares: 
         - traefik-auth
         - def-gzip@file

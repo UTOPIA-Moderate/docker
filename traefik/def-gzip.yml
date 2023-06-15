@@ -1,5 +1,5 @@
 http:
-  middlewareds:
+  middlewares:
     def-gzip:
       compress:
         minResponseBodyBytes: 1200
