@@ -1,0 +1,7 @@
+http:
+  middlewareds:
+    def-gzip:
+      compress:
+        minResponseBodyBytes: 1200
+        excludedContentTypes:
+          - text/event-stream

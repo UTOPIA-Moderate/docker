@@ -7,7 +7,9 @@ http:
       rule: Host(`dash.567222.xyz`)
       tls: 
         certresolver: myresolver
-      middlewares: traefik-auth
+      middlewares: 
+        - traefik-auth
+        - def-gzip@file
   middlewares:
     traefik-auth:
       basicauth:

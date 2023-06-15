@@ -1,17 +1,36 @@
-providers:
-  file:
-    directory: /etc/traefik/dynamic/
-    watch: true
-  docker:
-    endpoint: "unix:///var/run/docker.sock"
-api:
-  insecure: true
-  dashboard: true
+global:
+  checkNewVersion: false
+  sendAnonyMousUsage: false
 
 log:
   level: ERROR
   filePath: /var/log/traefik/error.log
   format: json
+
+api:
+  insecure: true
+  dashboard: true
+
+ping: {}
+
+accessLog:
+  filePath: /var/log/traefik/access.log
+  bufferingSize: 100
+  format: json
+  filters:
+    minDuration: 10ms
+
+providers:
+  docker:
+    watch: true
+    endpoint: "unix:///var/run/docker.sock"
+    swarmMode: fasle
+    useBindPortIP: fasle
+    network: traefik
+  file:
+    watch: true
+    directory: /etc/traefik/dynamic/
+    debugLogGeneratedTemplate: true
 
 entryPoints:
   web:
@@ -25,9 +44,18 @@ entryPoints:
     address: ":443"
 
 certificatesResolvers:
-  myresolver:
+  mycrt:
     acme:
       email: devil1990@outlook.com
-      storage: /home/traefik/acme.json
-      httpchallenge:
+      storage: /etc/traefik/acme.json
+      httpChallenge:
         entryPoint: web
+        delayBeforyCheck: 30
+
+metrics:
+  prometheus:
+    buckets:
+      - 0.1
+      - 0.3
+      - 1.2
+      - 5.0
