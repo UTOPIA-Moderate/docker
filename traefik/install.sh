@@ -3,7 +3,7 @@
 
 #二进制安装traefik
 echo "开始安装二进制"
-curl -o traefik.tar.gz -L https://github.com/traefik/traefik/releases/download/v2.10.1/traefik_v2.10.1_linux_amd64.tar.gz
+curl -o traefik.tar.gz -L https://github.com/traefik/traefik/releases/download/v2.10.5/traefik_v2.10.5_linux_amd64.tar.gz
 tar zxvf traefik.tar.gz -C /usr/local/bin traefik
 rm -f traefik.tar.gz
 traefik version
