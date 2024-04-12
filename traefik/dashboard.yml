@@ -4,7 +4,7 @@ http:
       entryPoints:
         - websecure
       service: api@internal
-      rule: Host(`dash.567222.xyz`)
+      rule: Host(`ccs.567222.xyz`)
       tls: 
         certresolver: mycrt
       middlewares: 
