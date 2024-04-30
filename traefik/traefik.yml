@@ -39,6 +39,13 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+
+    mintls13:
+      minVersion: VersionTLS13
 
 certificatesResolvers:
   mycrt:
