@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   rabbitMQ:
     image: rabbitmq:3.11.3-management
