@@ -6,6 +6,8 @@ REPO_OWNER="traefik"
 REPO_NAME="traefik"
 RELEASES_URL="https://api.github.com/repos/$REPO_OWNER/$REPO_NAME/releases/latest"
 
+apt install jq -y
+
 # 获取系统类型
 SYSTEM_ARCH=$(uname -m)
 if [[ $SYSTEM_ARCH == "x86_64" ]]; then
